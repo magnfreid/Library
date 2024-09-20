@@ -6,10 +6,11 @@ import java.util.Scanner;
 public class Library {
 
     private final ArrayList<Book> books;
-    //   private ArrayList<Book> bookReservations;
+
 
     Library(ArrayList<Book> books) {
         this.books = books;
+
     }
 
     Scanner scanner = new Scanner(System.in);
@@ -19,7 +20,8 @@ public class Library {
                 "1. View all books",
                 "2. Search books",
                 "3. Return a book",
-                "4. Exit"));
+                "4. See waiting list",
+                "5. Exit"));
         boolean userAtDesk = true;
         while (userAtDesk) {
             System.out.println("Welcome to the library!");
@@ -50,6 +52,16 @@ public class Library {
                     break;
                 }
                 case "4": {
+                    final ArrayList<Book> waitingList = new ArrayList<>();
+                    for (Book book : books) {
+                        if (!book.getWaitingList().isEmpty()) {
+                            waitingList.add(book);
+                        }
+                    }
+                    printWaitingList(waitingList);
+                    break;
+                }
+                case "5": {
                     System.out.println("Exiting...");
                     userAtDesk = false;
                     break;
@@ -75,14 +87,33 @@ public class Library {
                     System.out.println("You have successfully borrowed " + "\"" + bookToLoan.getTitle() + "\"");
                     bookToLoan.toggleIsAvailable();
                 } else {
-                    //TODO Lägg till logik för reservationer här
                     System.out.println("That book is not available at the moment.");
+                    waitingList(bookToLoan);
                 }
                 loaning = false;
             } else {
                 System.out.println("Invalid input, try again!");
             }
         }
+    }
+
+    private void waitingList(Book bookToLoan) {
+        String input = scanner.nextLine();
+        System.out.println("Would you like to join the waiting list?");
+        switch (input.toLowerCase()) {
+            case "yes": {
+                System.out.println("Enter your name:");
+                String name = scanner.nextLine();
+                bookToLoan.addNameToWaitingList(name);
+            }
+            case "no": {
+                System.out.println("Returning...");
+            }
+            default: {
+                System.out.println("Enter \"yes\" or \"no\"...");
+            }
+        }
+
     }
 
     private static boolean inputIsValidOption(ArrayList<Book> books, String input) {
@@ -123,7 +154,9 @@ public class Library {
                     returning = false;
                 } else if (inputIsValidOption) {
                     Book returnedBook = returnAbleBooks.get(Integer.parseInt(input) - 1);
-                    returnedBook.toggleIsAvailable();
+                    if (returnedBook.getWaitingList().isEmpty()) {
+                        returnedBook.toggleIsAvailable();
+                    }
                     System.out.println("You have successfully returned: " + returnedBook);
                     returning = false;
                 } else {
@@ -143,6 +176,18 @@ public class Library {
         }
     }
 
+    public void printWaitingList(ArrayList<Book> books) {
+        for (Book book : books) {
+            int index = 0;
+            System.out.println("Waiting list for " + book.getTitle());
+            System.out.println();
+            for (String name : book.getWaitingList()) {
+                System.out.println(index + 1 + ": " + name);
+                index++;
+            }
+        }
+    }
+
 
     public ArrayList<Book> searchBook(ArrayList<Book> books, String search) {
         //Använd LinkedHashSet för att undvika samma sökresultat flera gånger
@@ -157,7 +202,7 @@ public class Library {
                 searchResult.add(book);
             } else if (search.equals("available") && book.isAvailable()) {
                 searchResult.add(book);
-            }else if (search.equals("unavailable") && !book.isAvailable()) {
+            } else if (search.equals("unavailable") && !book.isAvailable()) {
                 searchResult.add(book);
             }
         }

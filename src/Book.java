@@ -1,12 +1,16 @@
+import java.util.ArrayList;
+
 public class Book {
     private final String title, author, year, description;
     private boolean available = true;
+    private final ArrayList<String> waitingList;
 
     public Book(String description, String year, String author, String title) {
         this.description = description;
         this.year = year;
         this.author = author;
         this.title = title;
+        waitingList = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -26,12 +30,20 @@ public class Book {
     }
 
     public String toString() {
-    return "\nTitle: " + this.title + "\nAuthor: " + this.author + "\nYear: " +this.year
-            + "\nDescription: " + this.description + (isAvailable() ? "\nAvailable" : "\nNot available");
+    return "\nTitle: " + title + "\nAuthor: " + author + "\nYear: " +year
+            + "\nDescription: " +description + (isAvailable() ? "\nAvailable" : "\nNot available");
     }
 
     public void toggleIsAvailable() {
-        this.available = !available;
+        available = !available;
+    }
+
+    public void addNameToWaitingList(String name) {
+        waitingList.add(name);
+    }
+
+    public ArrayList<String> getWaitingList(){
+        return waitingList;
     }
 
 
